@@ -1,57 +1,108 @@
-# Syllabus-aware learning hub
+# Syllabus Hub
+
+A syllabus-aware study workspace for engineering students. It organizes a student's selected course, semester, subjects and topics, then brings learning resources, personal notes, practice and study planning into one browser-based app.
+
+> **Prototype status:** this is a local pilot/demo, not a production student service. Sign-in is not real authentication, saved data stays in the current browser profile, and notes are not actually shared between students.
+
+## What it includes
+
+- A guided flow for demo sign-in, course/semester/subject selection, topic resources and a topic study area.
+- Resource organization and search for notes, videos, code, textbook references and past questions. Starter links include checked NPTEL course pages; they are not a complete or institution-approved KTU syllabus/resource set.
+- A study area with typed notes, a drawing board, uploads of PDF/TXT/Markdown notes, local text extraction, optional local OCR for scanned PDFs, and source-aware assistant tools.
+- Smart Notes, source-linked practice cards, spaced review, a focus timer, exam planning, deadlines and backups.
+- Profile privacy guidance, first-use walkthrough, feedback/takedown email drafts, larger text, a readable font option, reduced motion and visual themes.
+- Optional Gemini study assistance through a server route. The API key stays on the server and is never put in the browser bundle.
+
+## Requirements
+
+- Node.js 20.6 or newer
+- npm
+- A Gemini API key only if you want to use Gemini assistant features
 
 ## Run locally
 
-Run `npm install` and `npm run dev`. The prototype uses React, Vite, Tailwind CSS, MiniSearch, PDF.js, and optional browser-side Tesseract OCR. Run `npm test` for the pure utility tests and `npm run build` for a production build.
+```bash
+git clone <your-repository-url>
+cd <repository-folder>
+npm install
+Copy-Item .env.example .env
+npm run dev
+```
 
-## Student workflow
+Open [http://127.0.0.1:5173/](http://127.0.0.1:5173/). Keep the terminal running while using the app. On macOS/Linux, replace the PowerShell copy command with `cp .env.example .env`.
 
-1. Sign in with a demo name, email, and password-shaped value. Nothing is sent to a server and the app does not save the password.
-2. Choose a course, semester, subject, and syllabus topics.
-3. Open topic-matched resources and free-provider links for YouTube, NPTEL, and MIT OpenCourseWare.
-4. Study on the drawing board, keep typed notes, and ask the Gemini study assistant questions about readable materials.
+The app can be used without Gemini. To enable it, create a key in [Google AI Studio](https://aistudio.google.com/app/apikey) and add it to the root `.env` file:
 
-The step bar prevents skipping required steps. Student selection, bookmarks, personal resources, typed notes, current page, topic, and board strokes persist in local storage under `hub2.*`.
+```dotenv
+GEMINI_API_KEY=your_key_here
+```
 
-## Pilot features in this prototype
+Restart `npm run dev` after changing `.env`. Never use a `VITE_` prefix for the key, commit `.env`, or paste the key into source code. Optional public contact addresses for email drafts can be set as `VITE_FEEDBACK_EMAIL` and `VITE_TAKEDOWN_EMAIL` in `.env`; restart the dev server after changing them.
 
-- The resource page includes a topic evidence map showing the number of notes, videos, code, textbook items, and past questions. Counts show availability only; they do not verify relevance or syllabus coverage.
-- The dashboard has an optional weekly study goal. Pilot measures are off by default and require opt-in; they remain local to this browser profile and are not research-grade analytics.
-- Students can save a source-backed assistant response as a practice card and review it in the Study area. The card remains a draft and should be checked against its cited source.
-- Smart Notes includes source-linked summaries, note comparisons, 1/2/4/8-day spaced-review flashcards, and a confidence-based exam plan. The Study area also has a focus timer with a recap saved into topic notes.
-- First-time students get a short onboarding walkthrough. Profile includes the privacy notice, configured feedback/takedown email drafts, backup controls, and a walkthrough replay.
-- Uploads show possible exact-text duplicates from material already in this browser. This is a prompt for human review, not a copyright or legal check.
-- The Look settings include larger text, a readable system-font option, reduced motion, and the Pixel/Neon themes.
-- If local profile saving fails, the notes panel offers a retry action.
+## Useful commands
 
-## Notes and sharing prototype
+```bash
+npm run dev      # local app and API server
+npm test         # utility tests
+npm run build    # production build
+npm run preview  # serve the production build locally
+```
 
-Students can select individual files or a folder containing up to 20 PDF, TXT, or Markdown files. Text is extracted and matched to syllabus topics in the browser. Scanned PDFs require the student to opt into OCR; OCR is performed locally on up to 12 scanned pages per PDF. The first OCR use downloads the OCR engine and language data. The uploader can edit extracted text and change each suggested topic before saving.
+## Data, privacy and AI
 
-Shared notes are currently stored in the uploader’s demo profile in this browser. They are not delivered to classmates. The upload form records the uploader’s declared basis for sharing and any source/attribution details. Those fields are not independent copyright or legal verification; unclear claims need a human review process before real publication. Takedown email drafts require a configured `VITE_TAKEDOWN_EMAIL` address.
+- The demo sign-in does not verify identity. It does not save the password.
+- Student selections, notes, boards, uploads, flashcards and other profile data are stored in browser local storage. They are not encrypted, backed up to a server, or automatically synchronized. Anyone using the same browser profile may be able to access them.
+- Upload text extraction and optional OCR run in the browser. OCR may download its engine and language data on first use.
+- When a student submits a question to Gemini, the app sends readable content from the active topic and the selected sources needed for that request. Smart Notes sends the sources the student selects when they choose Prepare. The API key remains server-side.
+- Google’s [Gemini API Additional Terms](https://ai.google.dev/gemini-api/terms) describe different data handling for unpaid and paid services and include age/audience restrictions. Review the current terms and eligibility before using Gemini with students. Do not send sensitive, confidential or personal data.
+- Uploaded source declarations, duplicate detection and automatic flags are prompts for human review; they do not prove accuracy, ownership or legal permission to share.
+- Feedback and takedown buttons prepare email drafts. They do not send messages or create a server-side review queue.
 
-The current curated starter links are official NPTEL course pages, checked 19 October 2026: [Operating System Fundamentals (IIT Kharagpur)](https://nptel.ac.in/courses/106105214), [Data Structures and Algorithms (IIT Delhi)](https://nptel.ac.in/courses/106102064), and [Introduction to Database Systems (IIT Madras)](https://nptel.ac.in/courses/106106220). They are course-level references, not KTU-approved study notes or past question papers. The app displays who added each link and the date checked.
+## Technology
 
-## AI study assistant
+- React 19 and Vite 8
+- Tailwind CSS 3
+- Node.js HTTP server for the local app and Gemini API route
+- MiniSearch for local search
+- PDF.js for PDF text extraction and Tesseract.js for optional browser OCR
+- Browser local storage for demo profile data
 
-The Study area uses Google's Gemini 3.1 Flash-Lite model through a server-side API route. It sends up to eight readable sources from the active topic (including typed notes) when the student submits a question. The model is instructed to answer only from those sources and cite them as `[S1]`, `[S2]`, and so on. Links and video titles are not fetched or treated as readable source content. The assistant says when no readable notes are available and keeps a local excerpt search as a fallback.
+## Project layout
 
-To connect it, create a Gemini API key in [Google AI Studio](https://aistudio.google.com/app/apikey), copy `.env.example` to `.env`, and put the key after `GEMINI_API_KEY=`. Restart with `npm run dev`. The key stays on the server and must never be placed in `src/` or a `VITE_` variable. The in-app privacy notice explains that only current-topic readable text sent with Ask or ticked sources sent with Prepare go to Gemini. Google’s [current additional terms](https://ai.google.dev/gemini-api/terms) state that unpaid-service inputs and outputs may be used to improve products and human reviewers may process them; they also include an 18+ user requirement and a restriction against API clients directed to or likely accessed by people under 18. Paid API use with active billing is treated differently for product-improvement use but may still have limited safety/security logging. Review the current terms and eligibility before a student pilot; do not submit sensitive, confidential, or personal notes.
+```text
+src/
+  components/   shared UI, assistant, uploads, profile/support, study tools
+  lib/          local storage, backup, topic matching, OCR and study helpers
+  pages/        sign-in, course/topic selection, resources and study area
+  App.jsx       application flow and profile state
+  data.js       sample curriculum and curated starter resources
+server.mjs      local HTTP/Vite server and server-side Gemini route
+smartNotes.mjs  Smart Notes Gemini handler
+tests/          Node utility tests
+RUNBOOK.md      restart, key rotation, pilot checks and recovery notes
+```
 
-`npm run preview` serves the production build and the same API endpoint, so set `GEMINI_API_KEY` in the server environment there as well. The included request throttle is only an in-memory local-demo safeguard, not production authentication or abuse prevention. See [RUNBOOK.md](RUNBOOK.md) for key rotation, restart, pilot checks and rollback guidance.
+## Before a real student pilot
 
-The local server binds to `127.0.0.1`, checks same-origin requests for the AI endpoint, caps request/source sizes, and throttles requests. This protects the local demo from accidental exposure; it does not provide student accounts, secure shared hosting, or production-grade privacy. The sign-in remains a browser-only demo and local study data is not encrypted or protected from another person using the same browser profile.
+1. Replace sample curriculum with the exact, reviewed course scheme and syllabus version for the target institution and batch.
+2. Add real authentication, server-side ownership checks, database storage, private file storage, backup/recovery and moderation before describing materials as shared or private across accounts.
+3. Review privacy, copyright, age eligibility and institutional policies; configure and verify the feedback and takedown contacts.
+4. Complete keyboard-only, screen-reader and contrast checks. The project runbook contains a manual checklist; those checks are not represented as completed.
+5. Pilot with a small group and measure tasks with consent before making claims about learning outcomes.
 
-Pilot metrics, notes, practice cards, boards, and uploads are browser-local. There is no database, cloud file storage, multi-user authorization, server moderation queue, or offline synchronization yet. Do not treat the class library as a real shared service.
+Read [RUNBOOK.md](RUNBOOK.md) for restart, key rotation and pilot guidance.
 
-## Before using real students
+## GitHub setup
 
-- Replace sample curriculum and resources in `src/data.js` with reviewed institutional data.
-- Add server-side sign-in and per-student/class authorization.
-- Move personal and shared notes to a database/object store with retention, deletion, backup, and moderation policies.
-- Add an institution-owned rights review workflow; uploader declarations alone do not establish that a note may be shared.
-- Add real student sign-in, server-side authorization, robust API rate limits, and an institutional privacy review before exposing the model endpoint publicly.
-- Configure and test the feedback and takedown contacts; these local-demo buttons only prepare email drafts.
-- Complete the screen-reader, keyboard-only and contrast checks recorded in the runbook. They have not been verified yet.
+This folder already contains a Git repository, a `README.md`, a `.gitignore` and a lockfile. When creating the GitHub repository from this existing project, choose visibility intentionally, leave **Add a README** off and choose **No .gitignore** so GitHub does not create conflicting files. Decide on a license only after confirming you have the rights to license all included code and assets; no license means others do not receive permission to reuse the project by default.
 
-The starter links are curated third-party course references, not endorsements. External pages may change; confirm course relevance, availability and reuse terms on the provider’s site. Student-uploaded material is labeled by uploader and date; automated flags do not establish accuracy or legal permission.
+After creating an empty GitHub repository, connect and push it from this folder:
+
+```bash
+git status
+git remote add origin https://github.com/<your-username>/<your-repository>.git
+git branch -M main
+git push -u origin main
+```
+
+If `origin` already exists, inspect it with `git remote -v` and use `git remote set-url origin <repository-url>` instead of adding a second remote. Review `git status` and `git ls-files` before pushing, especially for keys, personal data, generated files, and the nested `SyllabusHub-Black-UI` snapshot.

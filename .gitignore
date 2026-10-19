@@ -1,6 +1,11 @@
 node_modules/
 dist/
 .vite/
-.env
-.env.*
+.env*
 !.env.example
+coverage/
+*.log
+output/
+tmp/
+.DS_Store
+Thumbs.db
